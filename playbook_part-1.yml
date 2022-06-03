@@ -1,0 +1,72 @@
+---
+- hosts: ubuntu
+  become: true
+  vars_files:
+     - vars.yml
+ 
+  tasks:
+
+  - name: Install required system packages
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'software-properties-common', 'python3-pip']
+     
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+
+  - name: Install docker-ce
+    apt: 
+      update_cache: yes 
+      name: docker-ce 
+      state: latest
+
+  - name: Install Docker Module for Python
+    pip: 
+      name: docker
+     
+  - name: Start docker container 
+    docker_container:
+       name: docker_mysql
+       image: mysql
+       command: --default-authentication-plugin=mysql_native_password
+       ports:
+        - "3306:3306"       
+       state: started
+       env:
+          MYSQL_ROOT_PASSWORD: '{{ mysql_pass }}'
+          MYSQL_ROOT_HOST: '%'
+    tags:
+        - sql 
+
+  - name: Pause docker network up
+    pause:
+       seconds: 10       
+
+- hosts: localhost
+  vars_files:
+      - vars.yml
+  tasks:
+  
+  - name: Create database
+    mysql_db:
+        name: newbases1
+        login_host: 172.16.90.130
+        login_user: '{{ username }}'
+        login_password: '{{ mysql_pass }}'   
+        state: present
+    tags: 
+       - base
+
+  
+    
+    
+    
+   
+
+    
