@@ -1,10 +1,17 @@
 [SERV_UBUNTU]
 ubuntu    ansible_host=172.16.90.130
 
+[SERV_EC2]
+ec2        ansible_host=ec2-3-87-158-93.compute-1.amazonaws.com
+
+[SERV_EC2:vars]
+ansible_ssh_private_key_file=/home/warcan/app/Ansible_My_SQL/aws-key.pem
+ansible_user=ec2-user
 
 [SERV_UBUNTU:vars]
 ansible_user=test
-#ansible_ssh_private_key_file=/home/warcan/app/keys/mint_rsa
 ansible_become_password=test
-ansible_python_interpreter=/usr/bin/python3.8
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
 
